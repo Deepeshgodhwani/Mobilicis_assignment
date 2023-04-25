@@ -3,6 +3,8 @@ const router = express();
 const User = require("../model/users");
 const { failureResponse, successResponse } = require("../utils/responseFormat");
 
+// query1 : Users which have income lower than $5 USD and have a car of brand “BMW” or “Mercedes”.
+
 router.get("/query1", async (req, res) => {
   try {
     let users = await User.find({
@@ -18,6 +20,8 @@ router.get("/query1", async (req, res) => {
   }
 });
 
+// query2 : Male Users which have phone price greater than 10,000.
+
 router.get("/query2", async (req, res) => {
   try {
     let users = await User.find({
@@ -32,6 +36,9 @@ router.get("/query2", async (req, res) => {
     return failureResponse(res, error.message, error);
   }
 });
+
+//query3 : Users whose last name starts with “M” and has a quote character length greater than 15
+// and email includes his/her last name.
 
 router.get("/query3", async (req, res) => {
   try {
@@ -53,6 +60,8 @@ router.get("/query3", async (req, res) => {
   }
 });
 
+//query4 : Users which have a car of brand “BMW”, “Mercedes” or “Audi” and whose email does not include any digit.
+
 router.get("/query4", async (req, res) => {
   try {
     let users = await User.find({
@@ -68,18 +77,21 @@ router.get("/query4", async (req, res) => {
   }
 });
 
+// query5 : Show the data of top 10 cities which have the highest number of users and their average income.
+
 router.get("/query5", async (req, res) => {
   try {
-    let users = await User.aggregate([{
-      $group: {
-        _id: "$city",
-        count: { $sum: 1 },
-        avgIncome: { $avg: { $toDouble: { $substr: ["$income", 1, -1] } } },
+    let users = await User.aggregate([
+      {
+        $group: {
+          _id: "$city",
+          count: { $sum: 1 },
+          avgIncome: { $avg: { $toDouble: { $substr: ["$income", 1, -1] } } },
+        },
       },
-    },
-    { $sort: { count: -1 } },
-    { $limit: 10 }
-  ]);
+      { $sort: { count: -1 } },
+      { $limit: 10 },
+    ]);
     return successResponse(res, "List of cities", users);
   } catch (error) {
     return failureResponse(res, error.message, error);

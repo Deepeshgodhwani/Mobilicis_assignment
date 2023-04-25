@@ -4,8 +4,10 @@ const cors = require("cors");
 const bodyParser=require('body-parser');
 const connectDb =require('./config/mongoose')
 const userRouter =require('./routes/userRoute')
+const path=require('path')
 const app = express();
 const PORT = process.env.PORT;
+
 
 
 
@@ -20,11 +22,27 @@ app.use(cors());
 // user api
 app.use("/api/users", userRouter);
 
-app.all("*", (req, res) => {
-  
-   res.status(404).send("404 NOT FOUND");
-   
+
+
+// ------------------------Deployement------------------------------------------>
+
+
+
+const __dirname1 = path.resolve();
+ 
+
+app.use(express.static(path.join(__dirname1,'frontend_build')))
+
+app.get('*',(req,res)=>{
+  res.sendFile(path.resolve(__dirname1,"frontend_build","index.html"))
 });
+
+
+
+
+
+
+// --------------------------------------------------------------------
 
 
 
@@ -32,6 +50,10 @@ app.all("*", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running successfully on ${PORT}`);
 });
+
+
+
+
 
 
 process.on("unhandledRejection", (err) => {
